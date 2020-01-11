@@ -4,37 +4,42 @@ const Promise = require('bluebird');
 module.exports.createSession = (req, res, next) => {
   // access the cookies on the request req.cookies
   req.session = {};
-  console.log('req...........', req);
+  // console.log('req...........', req);
   if (Object.keys(req.cookies).length === 0) {
     // req.session.hash = 0;
     models.Sessions.create()
       .then(result => {
-        if (result) {
-          var id = result.insertId;
-          models.Sessions.get({id})
-            .then(result => {
-              if (result) {
-                // console.log('session result: ', result);
-                req.session.hash = result.hash;
-                // console.log('req.session.........', req.session);
-                // console.log('res.cookieeeeeeeeee:', res.cookie)
-                res.cookie('shortlyid', {value: result.hash});
-                next();
-              }
-            });
-        }
+        var id = result.insertId;
+        models.Sessions.get({id})
+          .then(result => {
+            req.session.hash = result.hash;
+            res.cookie('shortlyid', {value: result.hash});
+            next();
+          });
       });
   } else {
     console.log('cookieeeeeeeeeeeereq:', req.cookies);
     var hash = req.cookies.shortlyid.value;
-    models.Sessions.get({hash: hash})
+    console.log("hash-----", hash);
+    console.log("req.cookies.....", req.cookies);
+    req.session.hash = hash;
+    console.log('SESSION.........', req.session);
+    models.Sessions.get({hash: req.session.hash})
       .then(result => {
-        if (!result) {
-          // req.session.hash = result.hash;
-        } else {
+        console.log("someRESULT.....", result);
+        // models.Users.get({result.})
+        // req.session.user.username = result.user.username;
+        // req.session.userId = result.userId;
+        // next();
+      });
+    // models.Sessions.get({hash: hash})
+    //   .then(result => {
+    //     if (!result) {
+    //       // req.session.hash = result.hash;
+    //     } else {
 
-        }
-      })
+    //     }
+    //   });
     next();
   }
   // look up the user data related to the session
