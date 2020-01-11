@@ -92,35 +92,51 @@ app.get('/signup',
     res.render('signup');
   });
 
-app.post('/signup',
+
+app.post('/login',
   (req, res, next) => {
-    console.log(req.body);
     var username = req.body.username;
     var password = req.body.password;
+    var options = { username: username, password: password };
 
-    return models.Users.create({
-      username: username,
-      password: password
-    })
-      .then((user) => {
-        return user;
+    return models.Users.get(options)
+  })
 
+app.post('/signup',
+  (req, res, next) => {
+    // console.log(req.body);
+    var username = req.body.username;
+    var password = req.body.password;
+    var options = { username: username, password: password };
+    return models.Users.get({username: username})
+      .then(result => {
+        // console.log('resulttttttttttt:', result);
+        if (!result) {
+          models.Users.create(options)
+            .then(user => {
+              res.redirect(200, '/');
+              // res.status(200).send(user);
+            });
+        } else {
+          res.redirect('/signup');
+
+        }
       })
       .error(error => {
         res.status(500).send(error);
-      })
-      .catch(user => {
-        res.status(200).send(user);
       });
+    // .error(error => {
+    // console.log('errorrrrrrrrr:', error);
+    // models.Users.create(options)
+    //   .then(user => {
+    //     res.status(200).send(user);
+    //   })
+    //   .error(error => {
+    //     res.status(500).send(error);
+    //   });
+    // });
 
-
-
-
-
-
-
-  }
-)
+  });
 
 
 /************************************************************/
