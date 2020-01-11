@@ -380,6 +380,7 @@ describe('', function() {
           var session = requestWithoutCookies.session;
           expect(session).to.exist;
           expect(session).to.be.an('object');
+          // console.log('+++++++++++++++++', session.hash)
           expect(session.hash).to.exist;
           done();
         });
