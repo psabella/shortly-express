@@ -98,9 +98,22 @@ app.post('/login',
     var username = req.body.username;
     var password = req.body.password;
     var options = { username: username, password: password };
-
-    return models.Users.get(options)
-  })
+    // get username from database, check if the password matches attempted password, if so, redirect to main page
+    return models.Users.get({username: username})
+      .then(result => {
+        if (result) {
+          // console.log('resulttttttttt', result)
+          var comparePw = models.Users.compare(password, result.password, result.salt);
+          if (comparePw) {
+            res.redirect(200, '/');
+          } else {
+            res.redirect('/login');
+          }
+        } else {
+          res.redirect('/login');
+        }
+      });
+  });
 
 app.post('/signup',
   (req, res, next) => {
@@ -125,17 +138,6 @@ app.post('/signup',
       .error(error => {
         res.status(500).send(error);
       });
-    // .error(error => {
-    // console.log('errorrrrrrrrr:', error);
-    // models.Users.create(options)
-    //   .then(user => {
-    //     res.status(200).send(user);
-    //   })
-    //   .error(error => {
-    //     res.status(500).send(error);
-    //   });
-    // });
-
   });
 
 
